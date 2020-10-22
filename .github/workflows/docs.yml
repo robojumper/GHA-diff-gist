@@ -12,7 +12,6 @@ jobs:
       id: check-diff
       shell: bash {0}
       run: |
-        echo "Test Content 1\n" > build_output.txt
         git diff --exit-code > diff.patch
         has_diff=$?
         echo "$has_diff"
