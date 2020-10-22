@@ -1,6 +1,6 @@
 name: docs
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   test:
@@ -12,6 +12,7 @@ jobs:
       id: check-diff
       shell: bash {0}
       run: |
+        echo "Test Content 0" > build_output.txt
         git diff --exit-code > diff.patch
         has_diff=$?
         echo "$has_diff"
