@@ -33,8 +33,10 @@ jobs:
         body="${body//$'\n'/'%0A'}"
         body="${body//$'\r'/'%0D'}" 
         echo ::set-output name=body::$body
+        echo ${{ github.event.pull_request.head.sha }}
     - name: Create commit comment
       if: ${{ steps.get-comment-body.outputs.body }}
       uses: peter-evans/commit-comment@v1
       with:
+        sha: ${{ github.event.pull_request.head.sha }}
         body: ${{ steps.get-comment-body.outputs.body }}
