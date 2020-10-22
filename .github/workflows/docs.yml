@@ -1,0 +1,34 @@
+name: docs
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Diff test
+      id: check_diff
+      shell: bash {0}
+      run: |
+        echo "Test Content 1\n" > build_output.txt
+        git diff --exit-code > diff.patch
+        has_diff=$?
+        echo "$has_diff"
+        if [ $has_diff -eq 1 ]
+        then
+          echo "Difference found"
+          cat diff.patch
+          echo "::set-output name=has_patch::true"
+        fi;
+    - name: Upload the diff
+      if: ${{ steps.check_diff.outputs.has_patch == 'true' }}
+      uses: actions/upload-artifact@v1
+      with:
+        name: diff.patch
+        path: diff.patch
+    - name: Fail the build
+      if: ${{ steps.check_diff.outputs.has_patch == 'true' }}
+      run: |
+        exit 1

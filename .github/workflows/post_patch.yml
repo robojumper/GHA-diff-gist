@@ -1,0 +1,14 @@
+name: check_post_patch
+
+on:
+  workflow_run:
+    workflows: ["docs"]
+    types: 
+      - completed
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Debug action
+      uses: hmarr/debug-action@v1.0.0
