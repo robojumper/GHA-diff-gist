@@ -7,8 +7,34 @@ on:
       - completed
 
 jobs:
-  check:
+  run:
     runs-on: ubuntu-latest
     steps:
-    - name: Debug action
-      uses: hmarr/debug-action@v1.0.0
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.6'
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Download artifacts
+      id: check-diff
+      if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+      run: |
+        python -m pip --disable-pip-version-check install requests
+        python ./.scripts/extract_diff.py diff.patch ${{ github.event.workflow_run.artifacts_url }} ${{ github.event.workflow_run.html_url }} ${{ secrets.GITHUB_TOKEN }} > msg.txt
+        if [ $? -eq 0 ]
+        then
+          echo "::set-output name=has_patch::1"
+        fi;
+    - id: get-comment-body
+      if: ${{ steps.check-diff.outputs.has_patch }}
+      run: |
+        body=$(cat msg.txt)
+        body="${body//'%'/'%25'}"
+        body="${body//$'\n'/'%0A'}"
+        body="${body//$'\r'/'%0D'}" 
+        echo ::set-output name=body::$body
+    - name: Create commit comment
+      if: ${{ steps.get-comment-body.outputs.body }}
+      uses: peter-evans/commit-comment@v1
+      with:
+        body: ${{ steps.get-comment-body.outputs.body }}

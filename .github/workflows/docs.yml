@@ -9,7 +9,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
     - name: Diff test
-      id: check_diff
+      id: check-diff
       shell: bash {0}
       run: |
         echo "Test Content 1\n" > build_output.txt
@@ -23,12 +23,12 @@ jobs:
           echo "::set-output name=has_patch::true"
         fi;
     - name: Upload the diff
-      if: ${{ steps.check_diff.outputs.has_patch == 'true' }}
+      if: ${{ steps.check-diff.outputs.has_patch == 'true' }}
       uses: actions/upload-artifact@v1
       with:
         name: diff.patch
         path: diff.patch
     - name: Fail the build
-      if: ${{ steps.check_diff.outputs.has_patch == 'true' }}
+      if: ${{ steps.check-diff.outputs.has_patch == 'true' }}
       run: |
         exit 1
