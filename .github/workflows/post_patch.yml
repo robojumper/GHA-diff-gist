@@ -17,25 +17,13 @@ jobs:
       uses: actions/checkout@v1
     - name: Download artifacts
       id: check-diff
-      if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'failure' }}
+      if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' }}
       run: |
         python -m pip --disable-pip-version-check install requests
-        python ./.scripts/extract_diff.py diff.patch ${{ github.event.workflow_run.artifacts_url }} ${{ github.event.workflow_run.html_url }} ${{ secrets.GITHUB_TOKEN }} > msg.txt
+        python ./.scripts/extract_diff.py new_contents.diff ${{ github.event.workflow_run.artifacts_url }} ${{ github.event.workflow_run.html_url }} ${{ secrets.GITHUB_TOKEN }} > msg.txt
         if [ $? -eq 0 ]
         then
-          echo "::set-output name=has_patch::1"
+          echo "::set-output name=has-diff::true"
         fi;
-    - id: get-comment-body
-      if: ${{ steps.check-diff.outputs.has_patch }}
-      run: |
-        body=$(cat msg.txt)
-        body="${body//'%'/'%25'}"
-        body="${body//$'\n'/'%0A'}"
-        body="${body//$'\r'/'%0D'}" 
-        echo ::set-output name=body::$body
-    - name: Create commit comment
-      if: ${{ steps.get-comment-body.outputs.body }}
-      uses: peter-evans/commit-comment@v1
-      with:
-        sha: ${{ github.event.workflow_run.head_sha }}
-        body: ${{ steps.get-comment-body.outputs.body }}
+    - name: Debug action
+      uses: hmarr/debug-action@v1.0.0

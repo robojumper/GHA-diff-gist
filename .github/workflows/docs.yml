@@ -3,31 +3,33 @@ name: docs
 on: [push, pull_request]
 
 jobs:
-  test:
+  check-event-templates:
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.6'
     - name: Checkout
       uses: actions/checkout@v1
-    - name: Diff test
-      id: check-diff
-      shell: bash {0}
+    - name: Find generated event templates
+      id: make-diff
       run: |
-        git diff --exit-code > diff.patch
-        has_diff=$?
-        echo "$has_diff"
-        if [ $has_diff -eq 1 ]
+        git checkout $(git merge-base HEAD $GITHUB_SHA)
+        cp build_output.txt untracked_output.txt
+        git add -f untracked_output.txt
+        git checkout $GITHUB_SHA
+        cp build_output.txt untracked_output.txt
+        git diff --exit-code > new_contents.diff
+        if [ $? -eq 1]
         then
           echo "Difference found"
           cat diff.patch
-          echo "::set-output name=has_patch::true"
-        fi;
+          echo "::set-output name=has-diff::true"
+        fi
     - name: Upload the diff
-      if: ${{ steps.check-diff.outputs.has_patch == 'true' }}
+      if: ${{ steps.make-diff.outputs.has-diff }}
       uses: actions/upload-artifact@v1
       with:
-        name: diff.patch
-        path: diff.patch
-    - name: Fail the build
-      if: ${{ steps.check-diff.outputs.has_patch == 'true' }}
-      run: |
-        exit 1
+        name: new_contents.diff
+        path: new_contents.diff
