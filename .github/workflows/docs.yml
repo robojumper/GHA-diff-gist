@@ -24,6 +24,7 @@ jobs:
         git checkout ${{ github.event.pull_request.head.sha }}
         cp build_output.txt untracked_output.txt
         mkdir tmp_art
+        git diff --exit-code
         git diff --exit-code > tmp_art/new_contents.diff
         if [ $? -eq 1 ]
         then
