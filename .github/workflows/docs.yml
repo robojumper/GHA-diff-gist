@@ -29,7 +29,7 @@ jobs:
         if [ $? -eq 1 ]
         then
           echo "Difference found"
-          cat diff.patch
+          cat tmp_art/new_contents.diff
           echo "::set-output name=has-diff::true"
           echo $PR_NUMBER > tmp_art/pr_number.txt
         fi

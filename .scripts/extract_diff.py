@@ -10,20 +10,18 @@ def handle_art_url(artifact):
                      headers={"Authorization": "token " + sys.argv[4]})
     if r.status_code == 200:
         zip = zipfile.ZipFile(BytesIO(r.content))
-        patch = zip.open(sys.argv[1])
-        print(
-            '**Pull request modifies event listener templates**\n\n',
-            '<details><summary>Difference (click to expand)</summary>\n\n```diff',
-            sep='')
-        print(patch.read().decode('utf-8'))
-        print(
-            '```\n</details>\n\n<details><summary>What? (click to expand)</summary>\n\n',
-            'The Highlander documentation tool generates event listener examples from event specifications. ',
-            'This comment contains the modifications that would be made to event ',
-            'listeners for PR authors and reviewers to inspect for correctness and will ',
-            'automatically be kept up-to-date whenever this PR is updated.</details>\n\n',
-            '<!-- GHA-event-listeners-diff -->',
-            sep='')
+        zip.extract('pr_number.txt')
+        patch = zip.open('new_contents.diff')
+        with open('msg.txt', 'w', encoding = 'utf-8') as f:
+            f.write('**Pull request modifies event listener templates**\n\n')
+            f.write('<details><summary>Difference (click to expand)</summary>\n\n```diff\n')
+            f.write(patch.read().decode('utf-8'))
+            f.write('\n```\n</details>\n\n<details><summary>What? (click to expand)</summary>\n\n')
+            f.write('The Highlander documentation tool generates event listener examples from event specifications. ')
+            f.write('This comment contains the modifications that would be made to event ',)
+            f.write('listeners for PR authors and reviewers to inspect for correctness and will ',)
+            f.write('automatically be kept up-to-date whenever this PR is updated.</details>\n\n',)
+            f.write('<!-- GHA-event-listeners-diff -->',)
         # early exit
         sys.exit(0)
 
