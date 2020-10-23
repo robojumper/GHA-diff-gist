@@ -21,7 +21,7 @@ jobs:
       if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' }}
       run: |
         python -m pip --disable-pip-version-check install requests
-        python ./.scripts/extract_diff.py ${{ github.event.workflow_run.artifacts_url }} ${{ github.event.workflow_run.html_url }} ${{ secrets.GITHUB_TOKEN }}
+        python ./.scripts/extract_diff.py ${{ github.event.workflow_run.artifacts_url }} ${{ secrets.GITHUB_TOKEN }}
         if [ $? -eq 0 ]
         then
           echo "::set-output name=has-diff::true"

@@ -7,7 +7,7 @@ from io import BytesIO
 
 def handle_art_url(artifact):
     r = requests.get(artifact,
-                     headers={"Authorization": "token " + sys.argv[4]})
+                     headers={'Authorization': 'token ' + sys.argv[3]})
     if r.status_code == 200:
         zip = zipfile.ZipFile(BytesIO(r.content))
         zip.extract('pr_number.txt')
@@ -27,15 +27,15 @@ def handle_art_url(artifact):
 
 
 def main():
-    url = sys.argv[2]
+    url = sys.argv[1]
     r = requests.get(url)
     if r.status_code == 200:
         js = r.json()
-        for art in js["artifacts"]:
-            if art["name"] == sys.argv[1]:
-                handle_art_url(art["archive_download_url"])
+        for art in js['artifacts']:
+            if art['name'] == 'new_contents.diff':
+                handle_art_url(art['archive_download_url'])
     sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
