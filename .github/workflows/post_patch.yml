@@ -45,5 +45,5 @@ jobs:
       with:
         edit-mode: replace
         issue-number: ${{ steps.check-diff.outputs.pr-number }}
-        comment-id: ${{ steps.check-diff.outputs.comment-id }}
+        comment-id: ${{ steps.find-comment.outputs.comment-id }}
         body: ${{ steps.check-diff.outputs.body }}
