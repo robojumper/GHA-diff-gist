@@ -7,7 +7,7 @@ from io import BytesIO
 
 def handle_art_url(artifact):
     r = requests.get(artifact,
-                     headers={'Authorization': 'token ' + sys.argv[3]})
+                     headers={'Authorization': 'token ' + sys.argv[2]})
     if r.status_code == 200:
         zip = zipfile.ZipFile(BytesIO(r.content))
         zip.extract('pr_number.txt')
