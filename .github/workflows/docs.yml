@@ -18,13 +18,10 @@ jobs:
       env:
         PR_NUMBER: ${{ github.event.number }}
       run: |
-        mrgcommit=$(git rev-parse HEAD)
-        echo $mrgcommit
-        echo ${{ github.sha }}
         git checkout ${{ github.base_ref }}
         cp build_output.txt untracked_output.txt
         git add -f untracked_output.txt
-        git checkout $mrgcommit
+        git checkout ${{ github.sha }}
         cp build_output.txt untracked_output.txt
         mkdir tmp_art
         git diff --exit-code > tmp_art/new_contents.diff
